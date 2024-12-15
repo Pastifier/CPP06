@@ -10,7 +10,7 @@
 
 static inline bool isPseudoLiteral(const std::string &rep) {
   return (rep == "nan" || rep == "nanf" || rep == "+inf" || rep == "-inf" ||
-          rep == "+inff" || rep == "-inff");
+          rep == "+inff" || rep == "-inff" || rep == "inf" || rep == "inff");
 }
 
 static inline bool isInteger(const std::string &rep) {
@@ -91,26 +91,27 @@ void ScalarConverter::convert(const std::string &rep) {
   }
 
   if (isFloat(rep)) {
-    float f = std::strtof(rep.c_str(), 0);
-    if (f == static_cast<float>(HUGE_VAL) ||
-        f == static_cast<float>(-HUGE_VAL)) {
+    char *end;
+    (void)end;
+    float f = std::strtof(rep.c_str(), &end);
+    if (isInf(f)) {
+      std::string sign = (rep[0] == '+') ? "+" : "";
       PRINT("char: impossible");
       PRINT("int: impossible");
-      PRINT("float: overflow occurred");
-      PRINT("double: overflow occurred");
+      PRINT("float: " << sign << f << "f");
+      PRINT("double: " << sign << f);
+    } else if (isNan(f)) {
+      PRINT("char: impossible");
+      PRINT("int: impossible");
+      PRINT("float: nanf");
+      PRINT("double: nan");
     } else {
       if (std::isprint(static_cast<int>(f))) {
         PRINT("char: '" << static_cast<char>(f) << "'");
-      } else if (isNan(f) || isInf(f)) {
-        PRINT("char: impossible");
       } else {
         PRINT("char: Non displayable");
       }
-      if (isNan(f) || isInf(f)) {
-        PRINT("int: impossible");
-      } else {
-        PRINT("int: " << static_cast<int>(f));
-      }
+      PRINT("int: " << static_cast<int>(f));
       PRINT("float: " << f << (std::floor(f) == f ? ".0f" : "f"));
       PRINT(
           "double: " << static_cast<double>(f)
@@ -120,25 +121,26 @@ void ScalarConverter::convert(const std::string &rep) {
   }
 
   if (isDouble(rep)) {
-    double d = std::strtod(rep.c_str(), 0);
-    if (d == HUGE_VAL || d == -HUGE_VAL) {
+    char *end;
+    double d = std::strtod(rep.c_str(), &end);
+    if (isInf(d)) {
+      std::string sign = (rep[0] == '+') ? "+" : "";
       PRINT("char: impossible");
       PRINT("int: impossible");
-      PRINT("float: overflow occurred");
-      PRINT("double: overflow occurred");
+      PRINT("float: " << sign << d << "f");
+      PRINT("double: " << sign << d);
+    } else if (isNan(d)) {
+      PRINT("char: impossible");
+      PRINT("int: impossible");
+      PRINT("float: nanf");
+      PRINT("double: nan");
     } else {
       if (std::isprint(static_cast<int>(d))) {
         PRINT("char: '" << static_cast<char>(d) << "'");
-      } else if (isNan(d) || isInf(d)) {
-        PRINT("char: impossible");
       } else {
         PRINT("char: Non displayable");
       }
-      if (isNan(d) || isInf(d)) {
-        PRINT("int: impossible");
-      } else {
-        PRINT("int: " << static_cast<int>(d));
-      }
+      PRINT("int: " << static_cast<int>(d));
       PRINT("float: " << static_cast<float>(d)
                       << (std::floor(d) == d ? ".0f" : "f"));
       PRINT("double: " << d << (std::floor(d) == d ? ".0" : ""));

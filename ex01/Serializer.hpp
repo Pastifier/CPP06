@@ -1,6 +1,6 @@
 #pragma once
 
-#if defined(i386) || defined(__i386__) || defined(__i386) || defined(_M_IX86)
+#if defined(i386) || defined(__i386__) || defined(__i386) || defined(_M_IX86) || defined(__MACH__)
 typedef unsigned long uintptr_t;
 #else
 typedef unsigned long long uintptr_t;

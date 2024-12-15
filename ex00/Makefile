@@ -1,5 +1,5 @@
 # Program
-NAME := scalar
+NAME := convert
 
 # Necessities
 CXX := c++
